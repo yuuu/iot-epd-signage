@@ -1,30 +1,28 @@
 from paho.mqtt import client as mqtt_client
+import json
 
 class Message:
-    def __init__(self):
-        def on_connect(client, userdata, flags, rc):
-            if rc == 0:
-                print("Connected to MQTT Broker!")
-            else:
-                print("Failed to connect, return code %d\n", rc)
-
+    def __init__(self, on_received):
         client = mqtt_client.Client("iot-epd-signage")
-        client.on_connect = on_connect
+        client.on_connect = self.on_connect
         client.connect('beam.soracom.io', 1883)
         client.loop_start()
         self.client = client
+        self.on_received = on_received
         
-    def publish(self):
-        print('publish')
-        self.client.publish('iot-epd-signage', '{"hello": "world!"}')
-
-    def subscribe(self, on_received):
-        def on_message(client, userdata, msg):
-            print(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
-            on_received(msg)
-
-        self.client.subscribe('#')
-        print('subscribe')
-        self.client.on_message = on_message
+    def wait(self):
         self.client.loop_forever()
         
+    def on_connect(self, client, userdata, flags, rc):
+        if rc == 0:
+            print("Connected to MQTT Broker!")
+            client.publish('iot-epd-signage', json.dumps({"hello": "world!"}))
+            client.subscribe('#')
+            client.on_message = self.on_message
+        else:
+            print("Failed to connect, return code %d\n", rc)
+
+    def on_message(self, client, userdata, msg):
+        print(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
+        self.on_received(json.loads(msg.payload.decode()))
+

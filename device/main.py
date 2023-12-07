@@ -33,7 +33,6 @@ def show_event(msg):
     )
     event.show()
 
-message = Message()
-message.publish()
-message.subscribe(show_event)
+message = Message(show_event)
+message.wait()
 
