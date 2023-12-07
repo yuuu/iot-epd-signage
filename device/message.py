@@ -18,9 +18,10 @@ class Message:
         print('publish')
         self.client.publish('iot-epd-signage', '{"hello": "world!"}')
 
-    def subscribe(self):
+    def subscribe(self, on_received):
         def on_message(client, userdata, msg):
             print(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
+            on_received(msg)
 
         self.client.subscribe('#')
         print('subscribe')
