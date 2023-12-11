@@ -28,6 +28,8 @@ Resources:
       CodeUri: calendar/
       Handler: app.lambda_handler
       Runtime: ruby3.2
+      Policies:
+        - arn:aws:iam::aws:policy/AWSIoTDataAccess
       Environment:
         Variables:
           AZURE_TENANT_ID: !Ref AzureTenantID
