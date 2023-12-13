@@ -5,7 +5,7 @@ require 'uri'
 require 'aws-sdk-iotdataplane'
 
 def logger
-  @logger ||= Logger.new($stdout, level: Logger::Severity::INFO)
+  @logger ||= Logger.new($stdout, level: Logger::Severity::DEBUG)
 end
 
 def auth_azure(tenant_id, client_id, client_secret)
@@ -31,8 +31,8 @@ def fetch_schedules(access_token, azure_user_principal_name)
     req.headers['Accept'] = 'application/json'
     req.headers['Prefer'] = "outlook.timezone=\"Asia/Tokyo\""
     req.params = {
-      startDateTime: (Date.today - 1).to_time.iso8601,
-      endDateTime: (Date.today).to_time.iso8601,
+      startDateTime: (Date.today - 3).to_time.iso8601,
+      endDateTime: (Date.today - 2).to_time.iso8601,
       orderby: 'start/dateTime asc'
     }
   end
@@ -41,16 +41,18 @@ def fetch_schedules(access_token, azure_user_principal_name)
 end
 
 def print_schedule(schedule)
+  logger.debug(schedule)
+
   started_at = Time.parse(schedule.dig('start', 'dateTime'))
   ended_at = Time.parse(schedule.dig('end', 'dateTime'))
   subject = schedule['type'] == 'exception' ? '非公開' : schedule['subject']
   return unless subject.match?(/Fusic Tech Live/)
 
+  message = { name: subject, started_at: started_at.strftime('%H:%M'), ended_at: ended_at.strftime('%H:%M')}.to_json
   client = Aws::IoTDataPlane::Client.new
-  resp = client.publish(
-    topic: "iot-epd-signage/schedules",
-    payload: { name: subject, started_at: started_at.to_i, ended_at: ended_at.to_i}.to_json
-  )
+  resp = client.publish(topic: "iot-epd-signage/schedules", payload: message)
+
+  logger.debug("published '#{message}'")
 end
 
 def lambda_handler(event:, context:)
@@ -61,4 +63,6 @@ def lambda_handler(event:, context:)
   access_token = auth_azure(*params.map { |key| ENV.fetch(key, nil) })
   schedules = fetch_schedules(access_token, ENV.fetch('AZURE_USER_PRINCIPAL_NAME', nil))
   schedules&.each { |schedule| print_schedule(schedule) }
+rescue => e
+  logger.fatal(e.message)
 end

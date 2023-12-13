@@ -26,13 +26,13 @@ class Event:
         now = datetime.now()
         font = ImageFont.truetype('./GenShinGothic-Normal.ttf', 32)
         draw = ImageDraw.Draw(img)
-        draw.text((260, 20), f'{now.year}年{now.month}月{now.day}日\n本日のイベント', 'black', font=font)
+        draw.text((20, 20), f'{now.year}年{now.month}月{now.day}日\n本日のイベント', 'black', font=font)
     
 
     def __body(self, img):
         font = ImageFont.truetype('./GenShinGothic-Normal.ttf', 28)
         draw = ImageDraw.Draw(img)
-        draw.text((260, 80), f"""
+        draw.text((20, 100), f"""
 {self.started_at}-{self.ended_at}
 {self.name}
 """, 'black', font=font)
@@ -41,5 +41,5 @@ class Event:
     def __footer(self, img):
         font = ImageFont.truetype('./GenShinGothic-Normal.ttf', 28)
         draw = ImageDraw.Draw(img)
-        draw.text((260, 340), 'ぜひご参加ください！', 'black', font=font)
+        draw.text((20, 340), 'ぜひご参加ください！', 'black', font=font)
 
