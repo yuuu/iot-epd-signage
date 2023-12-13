@@ -1,5 +1,6 @@
 source "https://rubygems.org"
 
-gem "httparty"
+gem "faraday"
+gem "aws-sdk-iotdataplane"
 
 ruby '~> 3.2.0'
