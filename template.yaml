@@ -47,7 +47,7 @@ Resources:
         Schedule:
           Type: ScheduleV2
           Properties:
-            ScheduleExpression: cron(* * ? * * *)
+            ScheduleExpression: cron(0 1 ? * * *)
             ScheduleExpressionTimezone: Japan
 
 Outputs:
