@@ -16,8 +16,8 @@ class Message:
     def on_connect(self, client, userdata, flags, rc):
         if rc == 0:
             print("Connected to MQTT Broker!")
-            client.publish('iot-epd-signage', json.dumps({"hello": "world!"}))
-            client.subscribe('#')
+            client.publish('iot-epd-signage/started', json.dumps({"hello": "world!"}))
+            client.subscribe('iot-epd-signage/schedules')
             client.on_message = self.on_message
         else:
             print("Failed to connect, return code %d\n", rc)

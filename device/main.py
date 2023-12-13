@@ -23,14 +23,8 @@ def show_logo():
     logo.show()
 
 def show_event(msg):
-    print(msg)
     paper = Paper()
-    event = Event(
-        paper,
-        "ハイブリッドで\nFusic Tech Live Vol.17\nAWS re:Invent 振り返り会",
-        "19:00",
-        "21:00"
-    )
+    event = Event(paper, msg['name'], msg['started_at'], msg['ended_at'])
     event.show()
 
 message = Message(show_event)
